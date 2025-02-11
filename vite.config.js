@@ -9,6 +9,10 @@ export default defineConfig({
   },
   preview: {
     port: process.env.PORT || 3000,
-    host: '0.0.0.0'
+    host: '0.0.0.0',
+    allowedHosts: [
+      'skill-matrix-app-3.onrender.com',
+      '.onrender.com', // This will allow all subdomains on render.com
+    ]
   }
 })
