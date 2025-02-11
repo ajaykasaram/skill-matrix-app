@@ -86,6 +86,8 @@ const SkillMatrix = () => {
     level: ''
   });
   
+  const [showValidation, setShowValidation] = useState(false);
+  
   const [data, setData] = useState([
     { name: 'John Doe', skillSet: '.NET', level: 'Expert' },
     { name: 'Bob Marty', skillSet: 'SQL Server', level: 'Intermediate' },
@@ -100,6 +102,11 @@ const SkillMatrix = () => {
   const levelOptions = ['Beginner', 'Intermediate', 'Expert'];
 
   const handleSearch = () => {
+    if (!searchTerm.trim()) {
+      setFilteredData(null);
+      return;
+    }
+    
     const searchTermLower = searchTerm.toLowerCase();
     const filtered = data.filter(item =>
       item.name.toLowerCase().includes(searchTermLower) ||
@@ -109,10 +116,34 @@ const SkillMatrix = () => {
   };
 
   const handleAddRecord = () => {
-    if (formData.name && formData.skillSet && formData.level) {
-      setData([...data, formData]);
+    setShowValidation(true);
+    console.log('Current form data:', formData);
+    
+    if (formData.name.trim() && formData.skillSet && formData.level) {
+      const newRecord = {
+        name: formData.name.trim(),
+        skillSet: formData.skillSet,
+        level: formData.level
+      };
+      
+      console.log('Adding new record:', newRecord);
+      
+      setData(prevData => {
+        const updatedData = [...prevData, newRecord];
+        console.log('Updated data:', updatedData);
+        return updatedData;
+      });
+      
       setFormData({ name: '', skillSet: '', level: '' });
       setIsDialogOpen(false);
+      setFilteredData(null);
+      setSearchTerm('');
+    } else {
+      console.log('Validation failed:', { 
+        hasName: Boolean(formData.name), 
+        hasSkill: Boolean(formData.skillSet), 
+        hasLevel: Boolean(formData.level) 
+      });
     }
   };
 
@@ -137,7 +168,17 @@ const SkillMatrix = () => {
             type="text"
             placeholder="Search by employee name or skill..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              if (!e.target.value.trim()) {
+                setFilteredData(null);
+              }
+            }}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleSearch();
+              }
+            }}
             className="flex-grow"
           />
           <Button 
@@ -170,6 +211,11 @@ const SkillMatrix = () => {
               ))}
             </tbody>
           </table>
+          {dataToDisplay.length === 0 && (
+            <div className="text-center py-4 text-gray-500">
+              No records found
+            </div>
+          )}
         </div>
       </CardContent>
 
@@ -184,6 +230,8 @@ const SkillMatrix = () => {
                 placeholder="Employee Name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className={`${!formData.name && 'border-red-300'}`}
+                required
               />
             </div>
             <div>
@@ -212,6 +260,11 @@ const SkillMatrix = () => {
                 ))}
               </Select>
             </div>
+            {showValidation && (!formData.name.trim() || !formData.skillSet || !formData.level) && (
+              <div className="text-red-500 text-sm">
+                Please fill in all fields
+              </div>
+            )}
             <Button 
               onClick={handleAddRecord} 
               className="bg-green-600 hover:bg-green-700 text-white px-4 py-2"
