@@ -1,10 +1,80 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus } from 'lucide-react';
+
+const Card = ({ children, className }) => (
+  <div className={`rounded-lg border bg-card text-card-foreground shadow-sm ${className}`}>
+    {children}
+  </div>
+);
+
+const CardHeader = ({ children }) => (
+  <div className="flex flex-col space-y-1.5 p-6">{children}</div>
+);
+
+const CardContent = ({ children }) => (
+  <div className="p-6 pt-0">{children}</div>
+);
+
+const Button = ({ children, className, ...props }) => (
+  <button
+    className={`inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background ${className}`}
+    {...props}
+  >
+    {children}
+  </button>
+);
+
+const Input = ({ className, ...props }) => (
+  <input
+    className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+    {...props}
+  />
+);
+
+const Dialog = ({ open, onOpenChange, children }) => {
+  if (!open) return null;
+  
+  return (
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+        {children}
+        <button
+          onClick={() => onOpenChange(false)}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const DialogContent = ({ children }) => (
+  <div>{children}</div>
+);
+
+const DialogHeader = ({ children }) => (
+  <div className="mb-4">{children}</div>
+);
+
+const DialogTitle = ({ children }) => (
+  <h2 className="text-lg font-semibold">{children}</h2>
+);
+
+const Select = ({ value, onValueChange, children }) => {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onValueChange(e.target.value)}
+      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    >
+      {children}
+    </select>
+  );
+};
+
+const SelectItem = ({ value, children }) => (
+  <option value={value}>{children}</option>
+);
 
 const SkillMatrix = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,7 +86,6 @@ const SkillMatrix = () => {
     level: ''
   });
   
-  // Initial data
   const [data, setData] = useState([
     { name: 'John Doe', skillSet: '.NET', level: 'Expert' },
     { name: 'Bob Marty', skillSet: 'SQL Server', level: 'Intermediate' },
@@ -53,65 +122,13 @@ const SkillMatrix = () => {
     <Card className="w-full max-w-4xl mx-auto mt-4">
       <CardHeader>
         <div className="flex justify-between items-center">
-          <CardTitle className="text-xl font-bold">SKILL MATRIX APP</CardTitle>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-green-600 hover:bg-green-700">
-                <Plus className="mr-2 h-4 w-4" /> Add Record
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Record</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div>
-                  <Input
-                    placeholder="Employee Name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Select
-                    value={formData.skillSet}
-                    onValueChange={(value) => setFormData({ ...formData, skillSet: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Skill Set" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {skillOptions.map((skill) => (
-                        <SelectItem key={skill} value={skill}>
-                          {skill}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Select
-                    value={formData.level}
-                    onValueChange={(value) => setFormData({ ...formData, level: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {levelOptions.map((level) => (
-                        <SelectItem key={level} value={level}>
-                          {level}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button onClick={handleAddRecord} className="bg-green-600 hover:bg-green-700">
-                  Add Record
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <h2 className="text-xl font-bold">SKILL MATRIX APP</h2>
+          <Button 
+            onClick={() => setIsDialogOpen(true)}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2"
+          >
+            + Add Record
+          </Button>
         </div>
       </CardHeader>
       <CardContent>
@@ -125,7 +142,7 @@ const SkillMatrix = () => {
           />
           <Button 
             onClick={handleSearch}
-            className="bg-green-600 hover:bg-green-700 text-white"
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2"
           >
             Search
           </Button>
@@ -155,6 +172,55 @@ const SkillMatrix = () => {
           </table>
         </div>
       </CardContent>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Record</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div>
+              <Input
+                placeholder="Employee Name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              />
+            </div>
+            <div>
+              <Select
+                value={formData.skillSet}
+                onValueChange={(value) => setFormData({ ...formData, skillSet: value })}
+              >
+                <option value="">Select Skill Set</option>
+                {skillOptions.map((skill) => (
+                  <SelectItem key={skill} value={skill}>
+                    {skill}
+                  </SelectItem>
+                ))}
+              </Select>
+            </div>
+            <div>
+              <Select
+                value={formData.level}
+                onValueChange={(value) => setFormData({ ...formData, level: value })}
+              >
+                <option value="">Select Level</option>
+                {levelOptions.map((level) => (
+                  <SelectItem key={level} value={level}>
+                    {level}
+                  </SelectItem>
+                ))}
+              </Select>
+            </div>
+            <Button 
+              onClick={handleAddRecord} 
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2"
+            >
+              Add Record
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
